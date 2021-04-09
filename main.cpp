@@ -4,6 +4,7 @@
  */
 
 #include "mbed.h"
+#include "dac8352.h"
 
 #define MAXIMUM_BUFFER_SIZE                                                  32
 
