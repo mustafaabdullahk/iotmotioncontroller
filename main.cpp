@@ -11,7 +11,7 @@
 #define MAXIMUM_BUFFER_SIZE                                                  32
 
 // Create a DigitalOutput object to toggle an LED whenever data is sended.
-static DigitalOut led(LED1);
+static DigitalOut led(LED3);
 static BufferedSerial serial_port(USBTX, USBRX);
 
 int main(void)
@@ -28,8 +28,8 @@ int main(void)
     char buf[MAXIMUM_BUFFER_SIZE] = {0};
     //Analog2Digital adc;
     Digital2Analog dac;
-    //dac.OutVoltage(0x30, 3);
-    //dac.OutVoltage(0x34, 3);
+    dac.OutVoltage(0x30, 3);
+    dac.OutVoltage(0x34, 3);
     while (1) {
         if (uint32_t num = serial_port.write(buf, sizeof(buf))) {
             // Toggle the LED.

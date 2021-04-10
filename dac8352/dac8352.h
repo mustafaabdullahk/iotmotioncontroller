@@ -9,8 +9,8 @@ class Digital2Analog{
 public:
     //SPI spi(D11, D12, D13); // mosi, miso, sclk
   Digital2Analog() {}
-  int WriteData(char Channel, char Data);
-  int OutVoltage(char Channel, float Voltage);
+  int WriteData(uint8_t Channel, uint16_t Data);
+  int OutVoltage(uint8_t Channel, uint16_t Data);
 public:
     char channel_A   = 0x30;
     char channel_B   = 0x34;

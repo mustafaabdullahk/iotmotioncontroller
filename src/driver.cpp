@@ -1,7 +1,7 @@
 #include "src/driver.h"
 
-static SPI spi(SPI_MOSI, SPI_MISO, SPI_SCK); // mosi, miso, sclk
-static DigitalOut cs(SPI_CS);
+SPI spi(SPI_MOSI, SPI_MISO, SPI_SCK); // mosi, miso, sclk
+DigitalOut cs(SPI_CS);
 
 Config::Config()
 {
@@ -18,9 +18,10 @@ int Config::WriteByte(int value)
         return state;
     return 0;
 }
-char* Config::WriteBytes(char *txData, int txSize, char *rxData, int rxSize)
+char* Config::WriteBytes(const char *txData, int txSize, char *rxData, int rxSize)
 {
     cs = false;
     spi.write(txData, txSize, rxData, rxSize);
+    cs = true;
     return rxData;
 }

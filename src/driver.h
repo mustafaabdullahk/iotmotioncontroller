@@ -9,7 +9,7 @@ class Config
 public:
     Config();
     int WriteByte(int value);
-    char* WriteBytes(char* txData, int txSize, char* rxData, int rxSize);
+    char* WriteBytes(const char* txData, int txSize, char* rxData, int rxSize);
 };
 
 #endif
