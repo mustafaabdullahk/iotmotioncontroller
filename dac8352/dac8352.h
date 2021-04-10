@@ -11,11 +11,12 @@ public:
   Digital2Analog() {}
   int WriteData(char Channel, char Data);
   int OutVoltage(char Channel, float Voltage);
-private:
+public:
     char channel_A   = 0x30;
     char channel_B   = 0x34;
     int DAC_Value_MAX   = 65535;
     float DAC_VREF      = 3.3;
+private:
     Config spiHandle;
 };
 #endif

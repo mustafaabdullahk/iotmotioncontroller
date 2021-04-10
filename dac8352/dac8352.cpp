@@ -3,7 +3,6 @@
 
 int Digital2Analog::WriteData(char Channel, char Data)
 {
-    DigitalOut chipSelect(SPI_CS);
     uint8_t bitShift = Data >> 8;
     uint8_t bitMask = Data & 0xFF;
     char *txData;
@@ -11,9 +10,7 @@ int Digital2Analog::WriteData(char Channel, char Data)
     txData[1] = (Data >> 8);
     txData[2] = (Data & 0xFF);
     char rxData;
-    chipSelect = false;
     spiHandle.WriteBytes(txData, sizeof(txData), &rxData, sizeof(rxData));
-    chipSelect = true;
     return 0;
 }
 

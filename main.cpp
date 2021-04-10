@@ -5,6 +5,8 @@
 
 #include "mbed.h"
 #include "dac8352.h"
+#include "ads1256.h"
+#include <cstdio>
 
 #define MAXIMUM_BUFFER_SIZE                                                  32
 
@@ -24,11 +26,20 @@ int main(void)
 
     // Application buffer to receive the data
     char buf[MAXIMUM_BUFFER_SIZE] = {0};
-
+    //Analog2Digital adc;
+    Digital2Analog dac;
+    //dac.OutVoltage(0x30, 3);
+    //dac.OutVoltage(0x34, 3);
     while (1) {
         if (uint32_t num = serial_port.write(buf, sizeof(buf))) {
             // Toggle the LED.
             led = !led;
+            //adc.GetAll();
+            //printf("0 ADC = %lf", adc.ADCValue[0]);
+            //float temp = (adc.ADCValue[0] >> 7) * 5.0 / 0xffff;
+            //printf("DAC: ", temp);
+           // dac.OutVoltage(dac.channel_A, temp);
+            //dac.OutVoltage(dac.channel_B, 3.3 - temp);
             // Echo the input back to the terminal.
             serial_port.write(buf, num);
         }

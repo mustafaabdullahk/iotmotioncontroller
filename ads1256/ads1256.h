@@ -83,6 +83,7 @@ public:
 private:
     Config spiHandle;
     int ScanMode = 0;
+public:
     int ADCValue[8] = {0,0,0,0,0,0,0,0};
 };
 #endif
