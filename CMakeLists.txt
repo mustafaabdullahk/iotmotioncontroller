@@ -6,12 +6,14 @@ cmake_minimum_required(VERSION 3.19.0 FATAL_ERROR)
 set(MBED_PATH ${CMAKE_CURRENT_SOURCE_DIR}/mbed-os CACHE INTERNAL "")
 set(DAC_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dac8352 CACHE INTERNAL "")
 set(ADC_PATH ${CMAKE_CURRENT_SOURCE_DIR}/ads1256 CACHE INTERNAL "")
+set(SRC_PATH ${CMAKE_CURRENT_SOURCE_DIR}/src CACHE INTERNAL "")
 set(MBED_CONFIG_PATH ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "")
 set(APP_TARGET mbed-os-example-blinky)
 
 include(${MBED_PATH}/tools/cmake/app.cmake)
 
 add_subdirectory(${MBED_PATH})
+add_subdirectory(${SRC_PATH})
 add_subdirectory(${DAC_PATH})
 add_subdirectory(${ADC_PATH})
 
@@ -23,6 +25,7 @@ project(${APP_TARGET})
 
 target_sources(${APP_TARGET}
     PRIVATE
+        src
         dac8352
         ads1256
         main.cpp

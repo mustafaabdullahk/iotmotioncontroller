@@ -1,10 +1,9 @@
 #ifndef MBED_ANALOG2DIGITAL_H
 #define MBED_ANALOG2DIGITAL_H
 
-#include "mbed.h"
-#include "hal/spi_api.h"
 #include <cstdint>
 #include <utility>
+#include "src/driver.h"
 
 class Analog2Digital{
 
@@ -80,5 +79,7 @@ public:
     int SetMode(char mode);
     int GetChannelValue(char Channel);
     int GetAll();
+private:
+    Config spiHandle;
 };
 #endif
