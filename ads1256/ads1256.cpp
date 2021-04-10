@@ -86,3 +86,104 @@ int Analog2Digital::ConfigureADC(unsigned char gain, unsigned char drate)
     spiHandle.WriteBytes(buf, sizeof(buf), rxData, sizeof(rxData));
     return 0;
 }
+
+int Analog2Digital::SetChannel(char chn)
+{
+    if (chn > 7) {
+    char *txData;
+    txData[0] = REG_MUX;
+    txData[1] = (chn << 4) | (1 << 3);
+    char *rxData;
+    spiHandle.WriteBytes(txData, sizeof(txData), rxData, sizeof(rxData));
+    }
+    return 0;
+}
+
+int Analog2Digital::SetDiffChannel(char chn)
+{
+    if (chn == 0) {
+        char *txData;
+        txData[0] = REG_MUX;
+        txData[1] = (0 << 4) | 1; //DiffChannal  AIN0-AIN1
+        char *rxData;
+        spiHandle.WriteBytes(txData, sizeof(txData), rxData, sizeof(rxData));
+    }
+    if (chn == 1) {
+        char *txData;
+        txData[0] = REG_MUX;
+        txData[1] = (2 << 4) | 3; //DiffChannal  AIN2-AIN3
+        char *rxData;
+        spiHandle.WriteBytes(txData, sizeof(txData), rxData, sizeof(rxData));
+    }
+    if (chn == 2) {
+        char *txData;
+        txData[0] = REG_MUX;
+        txData[1] = (4 << 4) | 5; //DiffChannal  AIN4-AIN5
+        char *rxData;
+        spiHandle.WriteBytes(txData, sizeof(txData), rxData, sizeof(rxData));
+    }
+    if (chn == 3) {
+        char *txData;
+        txData[0] = REG_MUX;
+        txData[1] = (6 << 4) | 7; //DiffChannal  AIN6-AIN7
+        char *rxData;
+        spiHandle.WriteBytes(txData, sizeof(txData), rxData, sizeof(rxData));
+    }
+    return 0;
+}
+
+void Analog2Digital::SetMode(char mode)
+{
+    ScanMode = mode;
+}
+
+int Analog2Digital::ReadADCData()
+{
+    WaitDRDY();
+    spiHandle.WriteByte(CMD_RDATA);
+    char *txData;
+    txData[0] = 3;
+    char *rxData;
+    spiHandle.WriteBytes(txData, sizeof(txData), rxData, sizeof(rxData));
+    int data;
+    data = (rxData[0] << 16) & 0xff0000;
+    data += (rxData[1] << 8) & 0xff00;
+    data += rxData[2] & 0xff;
+    if(data & 0x800000)
+    {
+        data &= 0xf000000;
+        return data;
+    }
+    return 0;
+}
+
+int Analog2Digital::GetChannelValue(char Channel)
+{
+    int value;
+    if (ScanMode == 0) {
+        if (Channel >= 8) {
+            return 0;
+        }
+        SetChannel(Channel);
+        WriteCommand(CMD_SYNC);
+        WriteCommand(CMD_WAKEUP);
+        value = ReadADCData();
+    }
+    else {
+        if (Channel >= 4) {
+            return 0;
+        }
+        SetDiffChannel(Channel);
+        WriteCommand(CMD_SYNC);
+        WriteCommand(CMD_WAKEUP);
+        value = ReadADCData();
+    }
+    return value;
+}
+
+void Analog2Digital::GetAll()
+{
+    for (int c = 0; c < 8; c++) {
+        ADCValue[c] = GetChannelValue(c);
+    }
+}

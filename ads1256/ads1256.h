@@ -76,10 +76,13 @@ public:
     int ConfigureADC(unsigned char gain, unsigned char drate);
     int SetChannel(char chn);
     int SetDiffChannel(char chn);
-    int SetMode(char mode);
+    void SetMode(char mode);
+    int ReadADCData();
     int GetChannelValue(char Channel);
-    int GetAll();
+    void GetAll();
 private:
     Config spiHandle;
+    int ScanMode = 0;
+    int ADCValue[8] = {0,0,0,0,0,0,0,0};
 };
 #endif
