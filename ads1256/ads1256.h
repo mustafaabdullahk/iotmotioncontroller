@@ -71,10 +71,10 @@ public:
     int Reset();
     int WriteCommand(char reg);
     int WriteRegister(char reg, char data);
-    int ReadData(char reg);
+    char* ReadData(char reg);
     int WaitDRDY();
     int ReadChipID();
-    int ConfigureADC();
+    int ConfigureADC(unsigned char gain, unsigned char drate);
     int SetChannel(char chn);
     int SetDiffChannel(char chn);
     int SetMode(char mode);
