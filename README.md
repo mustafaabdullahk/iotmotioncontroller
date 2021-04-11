@@ -1,9 +1,23 @@
 # IOT Motion Controller
 
-## Mbed OS build tools
+## Interface Definition
 
-### Mbed CLI 2
-TO DO
+| Pin    | Symbol | Description |
+| ------ | ------ | ------ |
+| 1, 17  | 3.3V   | Power supply (3.3V) |
+| 2      | 5V     | Power supply (5V) |
+| 3, 5, 7, 8, 10, 18, 22, 24, 26, 27, 28, 29, 32, 36, 38, 40  | NC | NC |
+| 6, 9, 14, 20, 25, 30, 34, 39  | GND | Ground |
+| 11     | DRDY   | ADS1256 data ready output, low active |
+| 12     | RESET  | ADS1256 reset input |
+| 13     | PWDN   | ADS1256 sync/power off input, low active |
+| 15     | CS0    | ADS1256 chip select, low active |
+| 16     | CS1    | DAC8532 chip select, low active |
+| 19     | DIN    | SPI data input |
+| 21     | DOUT   | SPI data output |
+| 23     | SCK    | SPI clock |
+| 31     | GPIO   | extend to sensor interface |
+
 
 ## Application functionality
 
