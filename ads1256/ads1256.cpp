@@ -2,7 +2,11 @@
 #include <cstdint>
 #include <cstdio>
 
-DigitalOut drdy(D8);
+#define DELAY 100
+
+
+DigitalOut drdy(D8); //ADS1256 data ready output, low active
+DigitalOut reset(D7); //ADS1256 reset input
 
 Analog2Digital::Analog2Digital()
 {
@@ -11,6 +15,11 @@ Analog2Digital::Analog2Digital()
 
 int Analog2Digital::Reset()
 {
+    reset = true;
+    wait_us(DELAY * 1000);
+    reset = false;
+    wait_us(DELAY * 1000);
+    reset = true;
     return 0;
 }
 

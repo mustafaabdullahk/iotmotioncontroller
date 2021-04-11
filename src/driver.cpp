@@ -1,7 +1,7 @@
 #include "src/driver.h"
 
 SPI spi(SPI_MOSI, SPI_MISO, SPI_SCK); // mosi, miso, sclk
-DigitalOut cs(SPI_CS);
+DigitalOut cs(SPI_CS); //chip select
 
 Config::Config()
 {
