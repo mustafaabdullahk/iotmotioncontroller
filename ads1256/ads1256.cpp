@@ -1,6 +1,7 @@
 #include "ads1256.h"
 #include <cstdint>
 #include <cstdio>
+#include <string>
 
 #define DELAY 100
 
@@ -23,33 +24,33 @@ int Analog2Digital::Reset()
     return 0;
 }
 
-int Analog2Digital::WriteCommand(char reg)
+int Analog2Digital::WriteCommand(uint8_t reg)
 {
-    spiHandle.WriteByte(reg);
+    spiHandle.WriteByte(static_cast<int>(reg));
     return 0;
 }
 
-int Analog2Digital::WriteRegister(char reg, char data)
+int Analog2Digital::WriteRegister(uint8_t reg, uint16_t data)
 {
-    char *txData;
-    txData[0] = CMD_WREG | reg;
-    txData[1] = 0x00;
-    txData[2] = data;
-    char rxData;
-    if(spiHandle.WriteBytes(txData,sizeof(txData), &rxData, sizeof(rxData)))
+    std::string str;
+    str.push_back(CMD_WREG | reg);
+    str.push_back(0x00);
+    str.push_back(data);
+    char rxData = 0;
+    if(spiHandle.WriteBytes(str.c_str(),sizeof(str.size()), &rxData, sizeof(rxData)) != nullptr)
     {
         return 1;
     }
     return 0;
 }
 
-char* Analog2Digital::ReadData(char reg)
+char* Analog2Digital::ReadData(uint8_t reg)
 {
-    char *txData;
-    txData[0] = CMD_RREG | reg;
-    txData[1] = 0x00;
-    char *rxData;
-    if(spiHandle.WriteBytes(txData,sizeof(txData), rxData, sizeof(rxData)))
+    std::string str;
+    str.push_back(CMD_RREG | reg);
+    str.push_back(0x00);
+    char *rxData = nullptr;
+    if(spiHandle.WriteBytes(str.c_str(),str.size(), rxData, sizeof(rxData)) != nullptr)
     {
         return rxData;
     }
@@ -96,7 +97,7 @@ int Analog2Digital::ConfigureADC(unsigned char gain, unsigned char drate)
     return 0;
 }
 
-int Analog2Digital::SetChannel(char chn)
+int Analog2Digital::SetChannel(uint8_t chn)
 {
     if (chn > 7) {
     char *txData;
@@ -111,32 +112,32 @@ int Analog2Digital::SetChannel(char chn)
 int Analog2Digital::SetDiffChannel(char chn)
 {
     if (chn == 0) {
-        char *txData;
-        txData[0] = REG_MUX;
-        txData[1] = (0 << 4) | 1; //DiffChannal  AIN0-AIN1
+        std::string str;
+        str.push_back(REG_MUX);
+        str.push_back((0 << 4) | 1);//DiffChannal  AIN0-AIN1
         char *rxData;
-        spiHandle.WriteBytes(txData, sizeof(txData), rxData, sizeof(rxData));
+        spiHandle.WriteBytes(str.c_str(), str.size(), rxData, sizeof(rxData));
     }
     if (chn == 1) {
-        char *txData;
-        txData[0] = REG_MUX;
-        txData[1] = (2 << 4) | 3; //DiffChannal  AIN2-AIN3
+        std::string str;
+        str.push_back(REG_MUX);
+        str.push_back((2 << 4) | 3); //DiffChannal  AIN2-AIN3
         char *rxData;
-        spiHandle.WriteBytes(txData, sizeof(txData), rxData, sizeof(rxData));
+        spiHandle.WriteBytes(str.c_str(), str.size(), rxData, sizeof(rxData));
     }
     if (chn == 2) {
-        char *txData;
-        txData[0] = REG_MUX;
-        txData[1] = (4 << 4) | 5; //DiffChannal  AIN4-AIN5
+        std::string str;
+        str.push_back(REG_MUX);
+        str.push_back((4 << 4) | 5); //DiffChannal  AIN4-AIN5
         char *rxData;
-        spiHandle.WriteBytes(txData, sizeof(txData), rxData, sizeof(rxData));
+        spiHandle.WriteBytes(str.c_str(), str.size(), rxData, sizeof(rxData));
     }
     if (chn == 3) {
-        char *txData;
-        txData[0] = REG_MUX;
-        txData[1] = (6 << 4) | 7; //DiffChannal  AIN6-AIN7
+        std::string str;
+        str.push_back(REG_MUX);
+        str.push_back((6 << 4) | 7); //DiffChannal  AIN6-AIN7
         char *rxData;
-        spiHandle.WriteBytes(txData, sizeof(txData), rxData, sizeof(rxData));
+        spiHandle.WriteBytes(str.c_str(), str.size(), rxData, sizeof(rxData));
     }
     return 0;
 }
@@ -150,10 +151,9 @@ int Analog2Digital::ReadADCData()
 {
     WaitDRDY();
     spiHandle.WriteByte(CMD_RDATA);
-    char *txData;
-    txData[0] = 3;
+    std::string str = std::to_string(3);
     char *rxData;
-    spiHandle.WriteBytes(txData, sizeof(txData), rxData, sizeof(rxData));
+    spiHandle.WriteBytes(str.c_str(), str.size(), rxData, sizeof(rxData));
     int data;
     data = (rxData[0] << 16) & 0xff0000;
     data += (rxData[1] << 8) & 0xff00;
@@ -166,11 +166,11 @@ int Analog2Digital::ReadADCData()
     return 0;
 }
 
-int Analog2Digital::GetChannelValue(char Channel)
+int Analog2Digital::GetChannelValue(uint8_t Channel)
 {
     int value;
     if (ScanMode == 0) {
-        if (Channel >= 8) {
+        if (Channel >= 0x08) {
             return 0;
         }
         SetChannel(Channel);

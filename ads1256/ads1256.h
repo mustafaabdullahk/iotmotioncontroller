@@ -68,17 +68,17 @@ public:
 public:
     Analog2Digital();
     int Reset();
-    int WriteCommand(char reg);
-    int WriteRegister(char reg, char data);
-    char* ReadData(char reg);
+    int WriteCommand(uint8_t reg);
+    int WriteRegister(uint8_t reg, uint16_t data);
+    char* ReadData(uint8_t reg);
     int WaitDRDY();
     int ReadChipID();
     int ConfigureADC(unsigned char gain, unsigned char drate);
-    int SetChannel(char chn);
+    int SetChannel(uint8_t chn);
     int SetDiffChannel(char chn);
     void SetMode(char mode);
     int ReadADCData();
-    int GetChannelValue(char Channel);
+    int GetChannelValue(uint8_t Channel);
     void GetAll();
 private:
     Config spiHandle;
