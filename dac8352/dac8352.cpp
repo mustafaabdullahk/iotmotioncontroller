@@ -15,7 +15,7 @@ int Digital2Analog::WriteData(uint8_t Channel, uint16_t Data)
     str.push_back(bitShift);
     str.push_back(bitMask);
     char rxData;
-    spiHandle.WriteBytes(str.c_str(), sizeof(str.size()), &rxData, sizeof(rxData));
+    spiHandle.WriteBytes(str.c_str(), str.size(), &rxData, sizeof(rxData));
     printf("DAC Write Byte Value: %u ", str.size());
     return 0;
 }
