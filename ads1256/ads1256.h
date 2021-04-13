@@ -74,11 +74,11 @@ public:
     int WaitDRDY();
     int ReadChipID();
     int ConfigureADC(unsigned char gain, unsigned char drate);
-    int SetChannel(uint8_t chn);
-    int SetDiffChannel(char chn);
+    int SetChannel(int chn);
+    int SetDiffChannel(int chn);
     void SetMode(char mode);
     int ReadADCData();
-    int GetChannelValue(uint8_t Channel);
+    int GetChannelValue(int Channel);
     void GetAll();
 private:
     Config spiHandle;

@@ -1,6 +1,7 @@
 #include "ads1256.h"
 #include <cstdint>
 #include <cstdio>
+#include <cstring>
 #include <string>
 
 #define DELAY 100
@@ -49,10 +50,13 @@ char* Analog2Digital::ReadData(uint8_t reg)
     std::string str;
     str.push_back(CMD_RREG | reg);
     str.push_back(0x00);
-    char *rxData = nullptr;
-    if(spiHandle.WriteBytes(str.c_str(),str.size(), rxData, sizeof(rxData)) != nullptr)
+    char rxData;
+    auto data = spiHandle.WriteBytes(str.c_str(),str.size(), &rxData, sizeof(rxData));
+    printf("Chip ID %x \r\n", str.at(0));
+    printf("Chip ID %c", rxData);
+    if(data != nullptr)
     {
-        return rxData;
+        return data;
     }
     return nullptr;
 }
@@ -60,8 +64,11 @@ int Analog2Digital::WaitDRDY()
 {
     for (int c = 0; c < 400000; c++) 
     {
-        if (drdy) {
+        if (drdy != 0) {
             printf("Timeout ...");
+        }
+        else {
+        return 1;
         }
     }
     return 0;
@@ -72,7 +79,7 @@ int Analog2Digital::ReadChipID()
     WaitDRDY();
     char *id = ReadData(REG_STATUS);
     char chipID = id[0] >> 4;
-    printf("Chip ID %f", chipID);
+    printf("Chip ID %c", chipID);
     return 0;
 }
 
@@ -97,19 +104,22 @@ int Analog2Digital::ConfigureADC(unsigned char gain, unsigned char drate)
     return 0;
 }
 
-int Analog2Digital::SetChannel(uint8_t chn)
+int Analog2Digital::SetChannel(int chn)
 {
     if (chn > 7) {
-    char *txData;
-    txData[0] = REG_MUX;
-    txData[1] = (chn << 4) | (1 << 3);
-    char *rxData;
-    spiHandle.WriteBytes(txData, sizeof(txData), rxData, sizeof(rxData));
+        return 0;
+    }
+    else {
+        std::string str;
+        str.push_back(REG_MUX);
+        str.push_back((chn << 4) | (1 << 3));
+        char rxData;
+        spiHandle.WriteBytes(str.c_str(), str.size(), &rxData, sizeof(rxData));
     }
     return 0;
 }
 
-int Analog2Digital::SetDiffChannel(char chn)
+int Analog2Digital::SetDiffChannel(int chn)
 {
     if (chn == 0) {
         std::string str;
@@ -150,42 +160,46 @@ void Analog2Digital::SetMode(char mode)
 int Analog2Digital::ReadADCData()
 {
     WaitDRDY();
-    spiHandle.WriteByte(CMD_RDATA);
-    std::string str = std::to_string(3);
-    char *rxData;
-    spiHandle.WriteBytes(str.c_str(), str.size(), rxData, sizeof(rxData));
-    int data;
-    data = (rxData[0] << 16) & 0xff0000;
-    data += (rxData[1] << 8) & 0xff00;
-    data += rxData[2] & 0xff;
-    if(data & 0x800000)
+    //spiHandle.WriteByte(static_cast<int>(CMD_RDATA));
+    std::string str = std::to_string(CMD_RDATA);
+    char rxData;
+    printf("txdata %s", str.c_str());
+    auto data = spiHandle.WriteBytes(str.c_str(), str.size(), &rxData, 3);
+    uint32_t value = 0;
+    printf("Rxdata %u", sizeof(rxData));
+    memcpy(&value, data, sizeof(data));
+    printf("value %i", value);
+    value = (data[0] << 16) & 0xff0000;
+    value += (data[1] << 8) & 0xff00;
+    value += data[2] & 0xff;
+    
+    if(value & 0x800000)
     {
-        data &= 0xf000000;
-        return data;
+        value &= 0xf000000;
+        return value;
     }
     return 0;
 }
 
-int Analog2Digital::GetChannelValue(uint8_t Channel)
+int Analog2Digital::GetChannelValue(int Channel)
 {
-    int value;
+    int value = 0;
     if (ScanMode == 0) {
-        if (Channel >= 0x08) {
-            return 0;
-        }
-        SetChannel(Channel);
-        WriteCommand(CMD_SYNC);
-        WriteCommand(CMD_WAKEUP);
-        value = ReadADCData();
-    }
-    else {
-        if (Channel >= 4) {
-            return 0;
-        }
-        SetDiffChannel(Channel);
-        WriteCommand(CMD_SYNC);
-        WriteCommand(CMD_WAKEUP);
-        value = ReadADCData();
+      if (Channel >= 8) {
+        return 0;
+      }
+      SetChannel(Channel);
+      WriteCommand(CMD_SYNC);
+      WriteCommand(CMD_WAKEUP);
+      value = ReadADCData();
+    } else {
+      if (Channel >= 4) {
+        return 0;
+      }
+      SetDiffChannel(Channel);
+      WriteCommand(CMD_SYNC);
+      WriteCommand(CMD_WAKEUP);
+      value = ReadADCData();
     }
     return value;
 }
