@@ -1,6 +1,27 @@
 #ifndef MBED_ANALOG2DIGITAL_H
 #define MBED_ANALOG2DIGITAL_H
 
+/*Status register define
+			Bits 7-4 ID3, ID2, ID1, ID0  Factory Programmed Identification Bits (Read Only)
+			Bit 3 ORDER: Data Output Bit Order
+				0 = Most Significant Bit First (default)
+				1 = Least Significant Bit First
+			Input data  is always shifted in most significant byte and bit first. Output data is always shifted out most significant
+			byte first. The ORDER bit only controls the bit order of the output data within the byte.
+			Bit 2 ACAL : Auto-Calibration
+				0 = Auto-Calibration Disabled (default)
+				1 = Auto-Calibration Enabled
+			When Auto-Calibration is enabled, self-calibration begins at the completion of the WREG command that changes
+			the PGA (bits 0-2 of ADCON register), DR (bits 7-0 in the DRATE register) or BUFEN (bit 1 in the STATUS register)
+			values.
+			Bit 1 BUFEN: Analog Input Buffer Enable
+				0 = Buffer Disabled (default)
+				1 = Buffer Enabled
+			Bit 0 DRDY :  Data Ready (Read Only)
+				This bit duplicates the state of the DRDY pin.
+			ACAL=1  enable  calibration
+*/
+
 #include <cstdint>
 #include <utility>
 #include "src/driver.h"

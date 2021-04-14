@@ -7,12 +7,11 @@
 #define DELAY 100
 
 
-DigitalOut drdy(D8); //ADS1256 data ready output, low active
+DigitalIn drdy(D8); //ADS1256 data ready output, low active
 DigitalOut reset(D7); //ADS1256 reset input
 
 Analog2Digital::Analog2Digital()
 {
-
 }
 
 int Analog2Digital::Reset()
@@ -52,8 +51,7 @@ char* Analog2Digital::ReadData(uint8_t reg)
     str.push_back(0x00);
     char rxData;
     auto data = spiHandle.WriteBytes(str.c_str(),str.size(), &rxData, sizeof(rxData));
-    printf("Chip ID %x \r\n", str.at(0));
-    printf("Chip ID %c", rxData);
+    printf("Chip ID %u \r\n", data[0]);
     if(data != nullptr)
     {
         return data;
@@ -62,14 +60,12 @@ char* Analog2Digital::ReadData(uint8_t reg)
 }
 int Analog2Digital::WaitDRDY()
 {
-    for (int c = 0; c < 400000; c++) 
-    {
-        if (drdy != 0) {
-            printf("Timeout ...");
-        }
-        else {
+    wait_us(DELAY * 1000);
+      auto state = drdy.read(); 
+      if (state != 0) {
+        printf("Timeout ...");
+      } else {
         return 1;
-        }
     }
     return 0;
 }
@@ -79,7 +75,7 @@ int Analog2Digital::ReadChipID()
     WaitDRDY();
     char *id = ReadData(REG_STATUS);
     char chipID = id[0] >> 4;
-    printf("Chip ID %c", chipID);
+    //printf("Chip ID %c", chipID);
     return 0;
 }
 
@@ -87,20 +83,21 @@ int Analog2Digital::ConfigureADC(unsigned char gain, unsigned char drate)
 {
     WaitDRDY();
     char *buf;
-    buf[0] = (0 << 3) | (1 << 2) | (0 << 1);
-    buf[1] = 0x08;
-    buf[2] = (0 << 5) | (0 << 3) | (gain << 0);
-    buf[3] = drate;
-    buf[4] = 0x00;
-    buf[5] = 0x00;
-    buf[6] = 0x00;
-    buf[7] = 0x00;
-    char *txdata;
-    txdata[0] = CMD_WREG | 0;
-    txdata[1] = 0x03;
-    char *rxData;
-    spiHandle.WriteBytes(txdata, sizeof(txdata), rxData, sizeof(rxData));
-    spiHandle.WriteBytes(buf, sizeof(buf), rxData, sizeof(rxData));
+    std::string str;
+    std::string cmd;
+    str.push_back((0 << 3) | (1 << 2) | (0 << 1));
+    str.push_back(0x08);
+    str.push_back((0 << 5) | (0 << 3) | (gain << 0));
+    str.push_back(drate);
+    str.push_back(0x00);
+    str.push_back(0x00);
+    str.push_back(0x00);
+    str.push_back(0x00);
+    cmd.push_back(CMD_WREG | 0);
+    cmd.push_back(0x03);
+    char rxData;
+    spiHandle.WriteBytes(cmd.c_str(), str.size(), &rxData, sizeof(rxData));
+    spiHandle.WriteBytes(str.c_str(), str.size(), &rxData, sizeof(rxData));
     return 0;
 }
 
@@ -163,12 +160,12 @@ int Analog2Digital::ReadADCData()
     //spiHandle.WriteByte(static_cast<int>(CMD_RDATA));
     std::string str = std::to_string(CMD_RDATA);
     char rxData;
-    printf("txdata %s", str.c_str());
+    //printf("txdata %s", str.c_str());
     auto data = spiHandle.WriteBytes(str.c_str(), str.size(), &rxData, 3);
     uint32_t value = 0;
-    printf("Rxdata %u", sizeof(rxData));
+    //printf("Rxdata %u", sizeof(rxData));
     memcpy(&value, data, sizeof(data));
-    printf("value %i", value);
+    //printf("value %i", value);
     value = (data[0] << 16) & 0xff0000;
     value += (data[1] << 8) & 0xff00;
     value += data[2] & 0xff;
