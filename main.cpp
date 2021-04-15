@@ -28,7 +28,7 @@ int main(void)
     char buf[MAXIMUM_BUFFER_SIZE] = {0};
     Analog2Digital adc;
     adc.Reset();
-    adc.ConfigureADC(adc.ADS1256_GAIN_1, adc.ADS1256_30000SPS);
+    //adc.ConfigureADC(adc.ADS1256_GAIN_1, adc.ADS1256_30000SPS);
     //Digital2Analog dac;
     //dac.OutVoltage(0x30, 3);
     //dac.OutVoltage(0x34, 3);
@@ -36,7 +36,7 @@ int main(void)
         if (uint32_t num = serial_port.write(buf, sizeof(buf))) {
             // Toggle the LED.
             led = !led;
-            
+            wait_us(500 * 1000);
             adc.ReadChipID();
             //adc.ConfigureADC(adc.ADS1256_GAIN_1, adc.ADS1256_30000SPS);
             //adc.GetAll();

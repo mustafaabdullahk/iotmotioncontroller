@@ -16,11 +16,11 @@ Analog2Digital::Analog2Digital()
 
 int Analog2Digital::Reset()
 {
-    reset = true;
+    reset = 1;
     wait_us(DELAY * 1000);
-    reset = false;
+    reset = 0;
     wait_us(DELAY * 1000);
-    reset = true;
+    reset = 1;
     return 0;
 }
 
